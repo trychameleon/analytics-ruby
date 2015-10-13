@@ -52,7 +52,7 @@ module Segment
 
           msg = @queue.pop
 
-          Time.parse(msg[:timestamp]).should == time
+          expect(Time.parse(msg[:timestamp])).to be_within(1.second).of(time)
         end
 
         it 'should not error with the required options' do
@@ -78,11 +78,11 @@ module Segment
             }
           })
           message = @queue.pop
-          message[:properties][:time].should == '2013-01-01T00:00:00.000Z'
-          message[:properties][:time_with_zone].should == '2013-01-01T00:00:00.000Z'
-          message[:properties][:date_time].should == '2013-01-01T00:00:00.000Z'
-          message[:properties][:date].should == '2013-01-01'
-          message[:properties][:nottime].should == 'x'
+          expect(message[:properties][:time]).to eq('2013-01-01T00:00:00.000Z')
+          expect(message[:properties][:time_with_zone]).to eq('2013-01-01T00:00:00.000Z')
+          expect(message[:properties][:date_time]).to eq('2013-01-01T00:00:00.000Z')
+          expect(message[:properties][:date]).to eq('2013-01-01')
+          expect(message[:properties][:nottime]).to eq('x')
         end
       end
 
@@ -119,11 +119,11 @@ module Segment
             }
           })
           message = @queue.pop
-          message[:traits][:time].should == '2013-01-01T00:00:00.000Z'
-          message[:traits][:time_with_zone].should == '2013-01-01T00:00:00.000Z'
-          message[:traits][:date_time].should == '2013-01-01T00:00:00.000Z'
-          message[:traits][:date].should == '2013-01-01'
-          message[:traits][:nottime].should == 'x'
+          expect(message[:traits][:time]).to eq('2013-01-01T00:00:00.000Z')
+          expect(message[:traits][:time_with_zone]).to eq('2013-01-01T00:00:00.000Z')
+          expect(message[:traits][:date_time]).to eq('2013-01-01T00:00:00.000Z')
+          expect(message[:traits][:date]).to eq('2013-01-01')
+          expect(message[:traits][:nottime]).to eq('x')
         end
       end
 
@@ -188,11 +188,11 @@ module Segment
             }
           })
           message = @queue.pop
-          message[:traits][:time].should == '2013-01-01T00:00:00.000Z'
-          message[:traits][:time_with_zone].should == '2013-01-01T00:00:00.000Z'
-          message[:traits][:date_time].should == '2013-01-01T00:00:00.000Z'
-          message[:traits][:date].should == '2013-01-01'
-          message[:traits][:nottime].should == 'x'
+          expect(message[:traits][:time]).to eq('2013-01-01T00:00:00.000Z')
+          expect(message[:traits][:time_with_zone]).to eq('2013-01-01T00:00:00.000Z')
+          expect(message[:traits][:date_time]).to eq('2013-01-01T00:00:00.000Z')
+          expect(message[:traits][:date]).to eq('2013-01-01')
+          expect(message[:traits][:nottime]).to eq('x')
         end
       end
 
@@ -241,7 +241,7 @@ module Segment
           @client.identify Queued::IDENTIFY
           @client.track Queued::TRACK
           @client.flush
-          @client.queued_messages.should == 0
+          expect(@client.queued_messages).to eq(0)
         end
 
         it 'should complete when the process forks' do
@@ -250,7 +250,7 @@ module Segment
           Process.fork do
             @client.track Queued::TRACK
             @client.flush
-            @client.queued_messages.should == 0
+            expect(@client.queued_messages).to eq(0)
           end
 
           Process.wait
@@ -258,31 +258,24 @@ module Segment
       end
 
       context 'common' do
-        check_property = proc { |msg, k, v| msg[k] && msg[k].should == v }
-
         before(:all) do
           @client = Client.new :write_key => WRITE_KEY
           @queue = @client.instance_variable_get :@queue
         end
 
-
-        it 'should not convert ids given as fixnums to strings' do
-          [:track, :screen, :page, :group, :identify, :alias].each do |s|
-            @client.send s, :user_id => 1, :group_id => 2, :previous_id => 3, :anonymous_id => 4, :event => "coco barked", :name => "coco"
+        [:track, :screen, :page, :group, :identify, :alias].each do |name|
+          it "should not convert ids given as fixnums to strings for #{name}" do
+            @client.send name, :user_id => 1, :group_id => 2, :previous_id => 3, :anonymous_id => 4, :event => "coco barked", :name => "coco"
             message = @queue.pop(true)
-            check_property.call(message, :userId, 1)
-            check_property.call(message, :groupId, 2)
-            check_property.call(message, :previousId, 3)
-            check_property.call(message, :anonymousId, 4)
+            classes = message.select {|key| %i(userId groupId previousId anonymousId).include?(key) }.values.map(&:class).uniq
+            expect(classes).to eq([Fixnum])
           end
-        end
 
-        it 'should send integrations' do
-          [:track, :screen, :page, :group, :identify, :alias].each do |s|
-            @client.send s, :integrations => { :All => true, :Salesforce => false }, :user_id => 1, :group_id => 2, :previous_id => 3, :anonymous_id => 4, :event => "coco barked", :name => "coco"
+          it "should send integrations for #{name}" do
+            @client.send name, :integrations => { :All => true, :Salesforce => false }, :user_id => 1, :group_id => 2, :previous_id => 3, :anonymous_id => 4, :event => "coco barked", :name => "coco"
             message = @queue.pop(true)
-            message[:integrations][:All].should be_true
-            message[:integrations][:Salesforce].should be_false
+            expect(message[:integrations][:All]).to eq(true)
+            expect(message[:integrations][:Salesforce]).to eq(false)
           end
         end
       end

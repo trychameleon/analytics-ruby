@@ -49,16 +49,10 @@ module Segment
       end
 
       def datetime_in_iso8601 datetime
-        case datetime
-        when Time
-            time_in_iso8601 datetime
-        when DateTime
-            time_in_iso8601 datetime.to_time
-        when Date
-          date_in_iso8601 datetime
-        else
-          datetime
-        end
+        datetime = datetime.to_time if datetime.is_a?(DateTime)
+        datetime = time_in_iso8601(datetime.utc) if datetime.class.name == 'Time'
+        datetime = date_in_iso8601(datetime) if datetime.is_a?(Date)
+        datetime
       end
 
       def time_in_iso8601 time, fraction_digits = 3

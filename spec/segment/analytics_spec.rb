@@ -16,7 +16,6 @@ module Segment
 
         it 'should not error with the required options' do
           analytics.track Queued::TRACK
-          sleep(1)
         end
       end
 
@@ -28,7 +27,6 @@ module Segment
 
         it 'should not error with the required options' do
           analytics.identify Queued::IDENTIFY
-          sleep(1)
         end
       end
 
@@ -43,7 +41,6 @@ module Segment
 
         it 'should not error with the required options' do
           analytics.alias ALIAS
-          sleep(1)
         end
       end
 
@@ -58,7 +55,6 @@ module Segment
 
         it 'should not error with the required options' do
           analytics.group Queued::GROUP
-          sleep(1)
         end
       end
 
@@ -69,7 +65,6 @@ module Segment
 
         it 'should not error with the required options' do
           analytics.page Queued::PAGE
-          sleep(1)
         end
       end
 
@@ -80,7 +75,6 @@ module Segment
 
         it 'should not error with the required options' do
           analytics.screen Queued::SCREEN
-          sleep(1)
         end
       end
 
