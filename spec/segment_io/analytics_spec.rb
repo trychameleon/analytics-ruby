@@ -1,9 +1,9 @@
 require 'spec_helper'
 
-module Segment
+module SegmentIo
   class Analytics
     describe Analytics do
-      let(:analytics) { Segment::Analytics.new :write_key => WRITE_KEY, :stub => true }
+      let(:analytics) { SegmentIo::Analytics.new :write_key => WRITE_KEY, :stub => true }
 
       describe '#track' do
         it 'errors without an event' do

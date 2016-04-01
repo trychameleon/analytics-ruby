@@ -1,1 +1,1 @@
-require 'segment/analytics'
+require 'segment_io/analytics'

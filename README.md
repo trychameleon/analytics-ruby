@@ -9,7 +9,7 @@ analytics-ruby is a ruby client for [Segment](https://segment.com)
 
 Into Gemfile from rubygems.org:
 ```
-gem 'analytics-ruby', :require => "segment"
+gem 'analytics-ruby', :require => "segment_io"
 ```
 
 Into environment gems from rubygems.org:
@@ -21,7 +21,7 @@ gem install 'analytics-ruby'
 
 Create an instance of the Analytics object:
 ```
-analytics = Segment::Analytics.new({
+analytics = SegmentIo::Analytics.new({
   write_key: 'YOUR_WRITE_KEY'
 })
 ```
@@ -59,7 +59,7 @@ Documentation is available at [segment.com/libraries/ruby](https://segment.com/l
 
 ## Testing
 
-You can use the `stub` option to Segment::Analytics.new to cause all requests to be stubbed, making it easier to test with this library.
+You can use the `stub` option to SegmentIo::Analytics.new to cause all requests to be stubbed, making it easier to test with this library.
 
 ## License
 

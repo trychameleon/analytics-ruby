@@ -1,4 +1,4 @@
-module Segment
+module SegmentIo
   class Analytics
     VERSION = '2.0.13'
   end

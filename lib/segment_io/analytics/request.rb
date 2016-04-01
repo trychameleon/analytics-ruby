@@ -1,17 +1,17 @@
-require 'segment/analytics/defaults'
-require 'segment/analytics/utils'
-require 'segment/analytics/response'
-require 'segment/analytics/logging'
+require 'segment_io/analytics/defaults'
+require 'segment_io/analytics/utils'
+require 'segment_io/analytics/response'
+require 'segment_io/analytics/logging'
 require 'net/http'
 require 'net/https'
 require 'json'
 
-module Segment
+module SegmentIo
   class Analytics
     class Request
-      include Segment::Analytics::Defaults::Request
-      include Segment::Analytics::Utils
-      include Segment::Analytics::Logging
+      include SegmentIo::Analytics::Defaults::Request
+      include SegmentIo::Analytics::Utils
+      include SegmentIo::Analytics::Logging
 
       # public: Creates a new request object to send analytics batch
       #

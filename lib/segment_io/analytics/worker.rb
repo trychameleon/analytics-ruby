@@ -1,13 +1,13 @@
-require 'segment/analytics/defaults'
-require 'segment/analytics/utils'
-require 'segment/analytics/defaults'
-require 'segment/analytics/request'
+require 'segment_io/analytics/defaults'
+require 'segment_io/analytics/utils'
+require 'segment_io/analytics/defaults'
+require 'segment_io/analytics/request'
 
-module Segment
+module SegmentIo
   class Analytics
     class Worker
-      include Segment::Analytics::Utils
-      include Segment::Analytics::Defaults
+      include SegmentIo::Analytics::Utils
+      include SegmentIo::Analytics::Defaults
 
       # public: Creates a new worker
       #
@@ -46,7 +46,6 @@ module Segment
 
           @on_error.call res.status, res.error unless res.status == 200
 
-          puts 'clearing'
           @lock.synchronize { @batch.clear }
         end
       end

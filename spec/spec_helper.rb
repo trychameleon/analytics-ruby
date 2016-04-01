@@ -1,4 +1,4 @@
-require 'segment/analytics'
+require 'segment_io/analytics'
 require 'wrong'
 require 'active_support/time'
 
@@ -7,7 +7,7 @@ include Wrong
 # Setting timezone for ActiveSupport::TimeWithZone to UTC
 Time.zone = 'UTC'
 
-module Segment
+module SegmentIo
   class Analytics
     WRITE_KEY = 'testsecret'
 

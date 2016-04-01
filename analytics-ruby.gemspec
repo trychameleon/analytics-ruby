@@ -1,8 +1,8 @@
-require File.expand_path('../lib/segment/analytics/version', __FILE__)
+require File.expand_path('../lib/segment_io/analytics/version', __FILE__)
 
 Gem::Specification.new do |spec|
   spec.name    = 'analytics-ruby'
-  spec.version = Segment::Analytics::VERSION
+  spec.version = SegmentIo::Analytics::VERSION
   spec.files   = Dir.glob('**/*')
   spec.require_paths = ['lib']
   spec.summary = 'Segment.io analytics library'

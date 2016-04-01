@@ -1,4 +1,4 @@
-module Segment
+module SegmentIo
   class Analytics
     class Response
       attr_reader :status, :error
