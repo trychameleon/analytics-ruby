@@ -11,69 +11,15 @@ module Segment
         end
       end
 
-      describe '#flush' do
-        before :all do
-          Segment::Analytics::Defaults::Request::BACKOFF = 0.1
-        end
-
-        after :all do
-          Segment::Analytics::Defaults::Request::BACKOFF = 30.0
-        end
-
-        it 'should not error if the endpoint is unreachable' do
-          expect(Net::HTTP::Post).to receive(:new).exactly(4).times.and_raise(Exception)
-
-          queue = Queue.new
-          queue << {}
-          worker = Segment::Analytics::Worker.new(queue, 'secret')
-          worker.run
-
-          expect(queue).to be_empty
-        end
-
-        it 'should execute the error handler if the request is invalid' do
-          expect_any_instance_of(Segment::Analytics::Request).to receive(:post).and_return(Segment::Analytics::Response.new(400, "Some error"))
-
-          on_error = Proc.new do |status, error|
-            puts "#{status}, #{error}"
-          end
-
-          expect(on_error).to receive(:call).once
-
-          queue = Queue.new
-          queue << {}
-          worker = Segment::Analytics::Worker.new queue, 'secret', :on_error => on_error
-          worker.run
-
-          expect(queue).to be_empty
-        end
-
-        it 'should not call on_error if the request is good' do
-
-          on_error = Proc.new do |status, error|
-            puts "#{status}, #{error}"
-          end
-
-          expect(on_error).not_to receive(:call)
-
-          queue = Queue.new
-          queue << Requested::TRACK
-          worker = Segment::Analytics::Worker.new queue, 'testsecret', :on_error => on_error
-          worker.run
-
-          expect(queue).to be_empty
-        end
-      end
-
       describe '#is_requesting?' do
-        it 'should not return true if there isn\'t a current batch' do
+        it 'does not return true if there isn\'t a current batch' do
           queue = Queue.new
           worker = Segment::Analytics::Worker.new(queue, 'testsecret')
 
           expect(worker.is_requesting?).to eq(false)
         end
 
-        it 'should return true if there is a current batch' do
+        it 'returns true if there is a current batch' do
           queue = Queue.new
           queue << Requested::TRACK
           worker = Segment::Analytics::Worker.new(queue, 'testsecret')
@@ -83,7 +29,74 @@ module Segment
             expect(worker.is_requesting?).to eq(false)
           end
 
+          # sleep 0.5
+
           eventually { expect(worker.is_requesting?).to eq(true) }
+        end
+      end
+
+      describe '#run' do
+        before :all do
+          Segment::Analytics::Defaults::Request::BACKOFF = 0.1
+        end
+
+        after :all do
+          Segment::Analytics::Defaults::Request::BACKOFF = 30.0
+        end
+
+        it 'does not error if the endpoint is unreachable' do
+          expect do
+            Net::HTTP.any_instance.stub(:post).and_raise(Exception)
+
+            queue = Queue.new
+            queue << {}
+            worker = Segment::Analytics::Worker.new(queue, 'secret')
+            worker.run
+
+            expect(queue).to be_empty
+
+            Net::HTTP.any_instance.unstub(:post)
+          end.to_not raise_error
+        end
+
+        it 'executes the error handler, before the request phase ends, if the request is invalid' do
+          Segment::Analytics::Request.any_instance.stub(:post).and_return(Segment::Analytics::Response.new(400, "Some error"))
+
+          status = error = nil
+          on_error = Proc.new do |yielded_status, yielded_error|
+            sleep 0.2 # Make this take longer than thread spin-up (below)
+            status, error = yielded_status, yielded_error
+          end
+
+          queue = Queue.new
+          queue << {}
+          worker = Segment::Analytics::Worker.new queue, 'secret', :on_error => on_error
+
+          # This is to ensure that Client#flush doesn’t finish before calling the error handler.
+          Thread.new { worker.run }
+          sleep 0.1 # First give thread time to spin-up.
+          sleep 0.01 while worker.is_requesting?
+
+          Segment::Analytics::Request::any_instance.unstub(:post)
+
+          expect(queue).to be_empty
+          expect(status).to eq(400)
+          expect(error).to eq('Some error')
+        end
+
+        it 'does not call on_error if the request is good' do
+          on_error = Proc.new do |status, error|
+            puts "#{status}, #{error}"
+          end
+
+          expect(on_error).to_not receive(:call)
+
+          queue = Queue.new
+          queue << Requested::TRACK
+          worker = Segment::Analytics::Worker.new queue, 'testsecret', :on_error => on_error
+          worker.run
+
+          expect(queue).to be_empty
         end
       end
     end
