@@ -128,7 +128,7 @@ installed. Please test out `2.2.6.pre` and hold off on using `2.2.5`.
 
 2.0.1 / 2014-05-15
 ==================
-* add: namespace under Segment::Analytics
+* add: namespace under SegmentIo::Analytics
 * add: can create multiple instances with creator method (rather than
     having a singleton)
 * add: logging with Logger instance or Rails.logger if available

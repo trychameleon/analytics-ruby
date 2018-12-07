@@ -6,11 +6,11 @@ require 'segment/analytics/logging'
 require 'segment/analytics/utils'
 require 'segment/analytics/worker'
 
-module Segment
+module SegmentIo
   class Analytics
     class Client
-      include Segment::Analytics::Utils
-      include Segment::Analytics::Logging
+      include SegmentIo::Analytics::Utils
+      include SegmentIo::Analytics::Logging
 
       # @param [Hash] opts
       # @option opts [String] :write_key Your project's write_key
@@ -375,7 +375,7 @@ module Segment
       #
       # context - Hash of call context
       def add_context(context)
-        context[:library] = { :name => 'analytics-ruby', :version => Segment::Analytics::VERSION.to_s }
+        context[:library] = { :name => 'analytics-ruby', :version => SegmentIo::Analytics::VERSION.to_s }
       end
 
       # private: Checks that the write_key is properly initialized

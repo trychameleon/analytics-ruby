@@ -40,7 +40,7 @@ command :send do |c|
   c.option '--groupId=<groupId>', String, 'the group id'
 
   c.action do |args, options|
-    Analytics = Segment::Analytics.new({
+    Analytics = SegmentIo::Analytics.new({
       write_key: options.writeKey,
       on_error: Proc.new { |status, msg| print msg }
     })

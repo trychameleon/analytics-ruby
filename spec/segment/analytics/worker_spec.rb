@@ -1,14 +1,12 @@
 require 'spec_helper'
 
-module Segment
+module SegmentIo
   class Analytics
     describe Worker do
       describe '#init' do
         it 'accepts string keys' do
           queue = Queue.new
-          worker = Segment::Analytics::Worker.new(queue,
-                                                  'secret',
-                                                  'batch_size' => 100)
+          worker = SegmentIo::Analytics::Worker.new(queue, 'secret', 'batch_size' => 100)
           batch = worker.instance_variable_get(:@batch)
           expect(batch.instance_variable_get(:@max_message_count)).to eq(100)
         end
@@ -16,11 +14,11 @@ module Segment
 
       describe '#run' do
         before :all do
-          Segment::Analytics::Defaults::Request::BACKOFF = 0.1
+          SegmentIo::Analytics::Defaults::Request::BACKOFF = 0.1
         end
 
         after :all do
-          Segment::Analytics::Defaults::Request::BACKOFF = 30.0
+          SegmentIo::Analytics::Defaults::Request::BACKOFF = 30.0
         end
 
         it 'does not error if the endpoint is unreachable' do
@@ -29,7 +27,7 @@ module Segment
 
             queue = Queue.new
             queue << {}
-            worker = Segment::Analytics::Worker.new(queue, 'secret')
+            worker = SegmentIo::Analytics::Worker.new(queue, 'secret')
             worker.run
 
             expect(queue).to be_empty
@@ -39,10 +37,10 @@ module Segment
         end
 
         it 'executes the error handler if the request is invalid' do
-          Segment::Analytics::Request
+          SegmentIo::Analytics::Request
             .any_instance
             .stub(:post)
-            .and_return(Segment::Analytics::Response.new(400, 'Some error'))
+            .and_return(SegmentIo::Analytics::Response.new(400, 'Some error'))
 
           status = error = nil
           on_error = proc do |yielded_status, yielded_error|
@@ -60,7 +58,7 @@ module Segment
           sleep 0.1 # First give thread time to spin-up.
           sleep 0.01 while worker.is_requesting?
 
-          Segment::Analytics::Request.any_instance.unstub(:post)
+          SegmentIo::Analytics::Request.any_instance.unstub(:post)
 
           expect(queue).to be_empty
           expect(status).to eq(400)
@@ -88,7 +86,7 @@ module Segment
       describe '#is_requesting?' do
         it 'does not return true if there isn\'t a current batch' do
           queue = Queue.new
-          worker = Segment::Analytics::Worker.new(queue, 'testsecret')
+          worker = SegmentIo::Analytics::Worker.new(queue, 'testsecret')
 
           expect(worker.is_requesting?).to eq(false)
         end
@@ -96,7 +94,7 @@ module Segment
         it 'returns true if there is a current batch' do
           queue = Queue.new
           queue << Requested::TRACK
-          worker = Segment::Analytics::Worker.new(queue, 'testsecret')
+          worker = SegmentIo::Analytics::Worker.new(queue, 'testsecret')
 
           worker_thread = Thread.new { worker.run }
           eventually { expect(worker.is_requesting?).to eq(true) }

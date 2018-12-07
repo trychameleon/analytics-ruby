@@ -1,9 +1,9 @@
 require 'segment/analytics/defaults'
 
-module Segment
+module SegmentIo
   class Analytics
     class BackoffPolicy
-      include Segment::Analytics::Defaults::BackoffPolicy
+      include SegmentIo::Analytics::Defaults::BackoffPolicy
 
       # @param [Hash] opts
       # @option opts [Numeric] :min_timeout_ms The minimum backoff timeout

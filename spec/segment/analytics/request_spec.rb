@@ -1,6 +1,6 @@
 require 'spec_helper'
 
-module Segment
+module SegmentIo
   class Analytics
     describe Request do
       before do
@@ -48,7 +48,7 @@ module Segment
 
           it 'sets a default backoff policy' do
             backoff_policy = subject.instance_variable_get(:@backoff_policy)
-            expect(backoff_policy).to be_a(Segment::Analytics::BackoffPolicy)
+            expect(backoff_policy).to be_a(SegmentIo::Analytics::BackoffPolicy)
           end
 
           it 'initializes a new Net::HTTP with default host and port' do

@@ -1,6 +1,6 @@
 require 'spec_helper'
 
-module Segment
+module SegmentIo
   class Analytics
     describe Response do
       describe '#status' do

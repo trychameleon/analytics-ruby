@@ -1,13 +1,13 @@
 require 'forwardable'
 require 'segment/analytics/logging'
 
-module Segment
+module SegmentIo
   class Analytics
     # A batch of `Message`s to be sent to the API
     class MessageBatch
       extend Forwardable
-      include Segment::Analytics::Logging
-      include Segment::Analytics::Defaults::MessageBatch
+      include SegmentIo::Analytics::Logging
+      include SegmentIo::Analytics::Defaults::MessageBatch
 
       def initialize(max_message_count)
         @messages = []
